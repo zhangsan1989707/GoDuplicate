@@ -84,6 +84,6 @@ func buildExecutePage(state *AppState) fyne.CanvasObject {
 		logList.Refresh()
 	})
 
-	controls := container.NewHBox(dryRun, widget.NewLabel(t(state, "label_conflict_policy")+":"), policySelect, previewBtn, executeBtn, undoBtn, openLogsBtn)
+	controls := container.NewHBox(dryRun, widget.NewLabel(t(state, "label_conflict_policy")+t(state, "label_colon")), policySelect, previewBtn, executeBtn, undoBtn, openLogsBtn)
 	return container.NewBorder(controls, nil, nil, nil, logList)
 }

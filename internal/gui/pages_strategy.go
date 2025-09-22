@@ -72,8 +72,8 @@ func buildStrategyPage(state *AppState, onPlan func([]core.PlanItem)) fyne.Canva
 	})
 
 	header := container.NewVBox(
-		container.NewHBox(widget.NewLabel(t(state, "label_strategy_template")+"："), templateSelect, genBtn),
-		container.NewHBox(widget.NewLabel(t(state, "label_policy_preset")+"："), presetName, saveBtn, loadBtn),
+		container.NewHBox(widget.NewLabel(t(state, "label_strategy_template")+t(state, "label_colon")), templateSelect, genBtn),
+		container.NewHBox(widget.NewLabel(t(state, "label_policy_preset")+t(state, "label_colon")), presetName, saveBtn, loadBtn),
 	)
 	return container.NewBorder(header, nil, nil, nil, list)
 }

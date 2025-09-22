@@ -20,21 +20,8 @@ type customTheme struct {
 // 重写字体方法，确保使用支持中文的字体
 func (c customTheme) Font(s fyne.TextStyle) fyne.Resource {
 	// 在Windows系统上，返回nil可以让Fyne自动在系统中查找支持中文的字体
-	// 这是解决中文显示为问号问题的关键方法
-	// Windows会优先使用系统中已安装的中文字体如微软雅黑、宋体、黑体等
-	// 重要：不要返回c.baseTheme.Font(s)，这可能会强制使用不支持中文的默认字体
 	return nil
 }
-
-// 确保所有文本元素都使用系统默认字体（支持中文）
-func ensureChineseFontSupport() {
-	// 这个函数确保应用程序在启动时就配置好支持中文的字体
-	// 在Windows系统上，通过让Font方法返回nil，Fyne会自动查找系统中支持中文的字体
-}
-
-
-	
-	
 
 // 确保其他主题方法正常工作
 func (c customTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
@@ -52,6 +39,17 @@ func (c customTheme) Size(name fyne.ThemeSizeName) float32 {
 // 创建支持中文的自定义主题
 func newChineseTheme(base fyne.Theme) fyne.Theme {
 	return customTheme{baseTheme: base}
+}
+
+// 确保所有文本元素都使用系统默认字体（支持中文）
+func ensureChineseFontSupport() {
+	// 确保应用程序使用系统字体
+}
+
+// 确保中文显示正常
+func init() {
+	// 初始化时就确保中文支持
+	ensureChineseFontSupport()
 }
 
 // Run starts the GUI application with placeholder pages matching requirements.

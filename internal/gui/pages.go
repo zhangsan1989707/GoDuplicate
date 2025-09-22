@@ -158,7 +158,7 @@ func buildMonitorPage(state *AppState) fyne.CanvasObject {
 			dt := now.Sub(lastTime).Seconds()
 			if dt > 0 {
 				spd := float64(f-lastFiles) / dt
-				speed.SetText(fmt.Sprintf("%s %.1f 文件/秒", t(state, "label_speed"), spd))
+				speed.SetText(fmt.Sprintf("%s %.1f %s", t(state, "label_speed"), spd, t(state, "speed_unit")))
 			}
 			lastFiles = f
 			lastTime = now
