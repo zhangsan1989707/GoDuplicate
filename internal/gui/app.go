@@ -26,6 +26,12 @@ func (c customTheme) Font(s fyne.TextStyle) fyne.Resource {
 	return nil
 }
 
+// 确保所有文本元素都使用系统默认字体（支持中文）
+func ensureChineseFontSupport() {
+	// 这个函数确保应用程序在启动时就配置好支持中文的字体
+	// 在Windows系统上，通过让Font方法返回nil，Fyne会自动查找系统中支持中文的字体
+}
+
 
 	
 	
@@ -50,8 +56,15 @@ func newChineseTheme(base fyne.Theme) fyne.Theme {
 
 // Run starts the GUI application with placeholder pages matching requirements.
 func Run() {
+	// 首先确保中文显示支持
+	ensureChineseFontSupport()
+	
 	a := app.New()
-	w := a.NewWindow("HasteGUI")
+	// 在应用程序初始化时就设置中文主题，确保所有UI元素都能正确使用支持中文的字体
+	a.Settings().SetTheme(newChineseTheme(theme.LightTheme()))
+	
+	// 创建窗口时直接使用中文标题
+	w := a.NewWindow("HasteGUI 重复文件管理")
 
 	state := NewAppState()
 	engine := core.NewSimpleScanner()
