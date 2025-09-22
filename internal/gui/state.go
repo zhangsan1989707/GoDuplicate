@@ -50,7 +50,7 @@ func NewAppState() *AppState {
 		HashAlgorithm:       "sha1",
 		SimilarityThreshold: 0.85,
 		Theme:               "light",
-		Language:            "zh-CN",
+		Language:            "en-US",
 		ThumbCache:          make(map[string]image.Image),
 	}
 }
