@@ -19,9 +19,10 @@ type customTheme struct {
 
 // 重写字体方法，确保使用支持中文的字体
 func (c customTheme) Font(s fyne.TextStyle) fyne.Resource {
-	// 在Windows上，返回nil让Fyne自动在系统中查找支持中文的字体
-	// 但我们需要确保系统能正确识别中文字符
-	// Windows会优先使用系统字体如微软雅黑、宋体、黑体等
+	// 在Windows系统上，返回nil可以让Fyne自动在系统中查找支持中文的字体
+	// 这是解决中文显示为问号问题的关键方法
+	// Windows会优先使用系统中已安装的中文字体如微软雅黑、宋体、黑体等
+	// 重要：不要返回c.baseTheme.Font(s)，这可能会强制使用不支持中文的默认字体
 	return nil
 }
 
