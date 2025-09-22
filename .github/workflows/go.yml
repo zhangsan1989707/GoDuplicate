@@ -24,6 +24,12 @@ jobs:
         with:
           go-version: '1.20'  # 项目使用的Go版本
           check-latest: true
+          
+      - name: 清理Go模块缓存
+        run: |
+          go clean -modcache
+          go clean -cache
+        shell: pwsh
 
       - name: 安装Visual Studio Build Tools（用于CGO）
         uses: ilammy/msvc-dev-cmd@v1
