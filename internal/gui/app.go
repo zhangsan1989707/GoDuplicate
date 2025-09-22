@@ -22,10 +22,10 @@ type customTheme struct {
 
 // 重写字体方法，确保使用支持中文的字体
 func (c customTheme) Font(s fyne.TextStyle) fyne.Resource {
-	// Fyne会自动在系统中查找适合的字体
-	// 在Windows上，通常会使用系统默认字体如微软雅黑、宋体等
-	// 这里我们不指定具体字体文件，让Fyne自动处理
-	return c.baseTheme.Font(s)
+	// 在Windows上，显式指定使用系统默认中文字体
+	// 这里我们不返回具体字体资源，让Fyne自动在系统中查找支持中文的字体
+	// Windows会优先使用系统字体如微软雅黑、宋体等
+	return nil
 }
 
 // 确保其他主题方法正常工作

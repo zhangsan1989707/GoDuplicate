@@ -18,7 +18,7 @@ import (
 // buildConfigPage returns the configuration form tab
 func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.CanvasObject {
 	includeEntry := widget.NewEntry()
-	includeEntry.SetPlaceHolder("示例: D\\;E\\docs")
+	includeEntry.SetPlaceHolder(t(state, "placeholder_include"))
 	includeEntry.OnChanged = func(v string) {
 		state.mu.Lock()
 		state.IncludePathsInput = v
@@ -26,7 +26,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 	}
 
 	excludeEntry := widget.NewEntry()
-	excludeEntry.SetPlaceHolder("示例: *.tmp;node_modules;*.bak")
+	excludeEntry.SetPlaceHolder(t(state, "placeholder_exclude"))
 	excludeEntry.OnChanged = func(v string) {
 		state.mu.Lock()
 		state.ExcludePatternsInput = v
@@ -48,7 +48,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 	hashSelect.Selected = state.HashAlgorithm
 
 	minEntry := widget.NewEntry()
-	minEntry.SetPlaceHolder("最小大小(字节)")
+	minEntry.SetPlaceHolder(t(state, "placeholder_min_size"))
 	minEntry.OnChanged = func(v string) {
 		if n, err := strconv.ParseInt(v, 10, 64); err == nil {
 			state.mu.Lock()
@@ -57,7 +57,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 		}
 	}
 	maxEntry := widget.NewEntry()
-	maxEntry.SetPlaceHolder("最大大小(字节,0不限)")
+	maxEntry.SetPlaceHolder(t(state, "placeholder_max_size"))
 	maxEntry.OnChanged = func(v string) {
 		if n, err := strconv.ParseInt(v, 10, 64); err == nil {
 			state.mu.Lock()
@@ -68,7 +68,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 
 	concurrency := widget.NewSlider(1, 16)
 	concurrency.Step = 1
-	cLabel := widget.NewLabel(fmt.Sprintf("并发度: %d", int(concurrency.Value)))
+	cLabel := widget.NewLabel(fmt.Sprintf(t(state, "label_concurrency"), int(concurrency.Value)))
 	concurrency.OnChanged = func(v float64) {
 		iv := int(v)
 		cLabel.SetText(fmt.Sprintf("并发度: %d", iv))
@@ -81,7 +81,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 	// similarity slider 0.50~0.99
 	simSlider := widget.NewSlider(0.5, 0.99)
 	simSlider.Step = 0.01
-	simLabel := widget.NewLabel(fmt.Sprintf("相似度阈值: %.2f", state.SimilarityThreshold))
+	simLabel := widget.NewLabel(fmt.Sprintf(t(state, "label_similarity"), state.SimilarityThreshold))
 	simSlider.OnChanged = func(v float64) {
 		state.mu.Lock()
 		state.SimilarityThreshold = v
@@ -90,11 +90,11 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 	}
 	simSlider.SetValue(state.SimilarityThreshold)
 
-	startBtn := widget.NewButton("开始扫描", func() {
+	startBtn := widget.NewButton(t(state, "btn_start_scan"), func() {
 		onStart(state.ToScanConfig())
 	})
 
-	pickDirBtn := widget.NewButton("选择目录", func() {
+	pickDirBtn := widget.NewButton(t(state, "btn_pick_dir"), func() {
 		dialog.ShowFolderOpen(func(u fyne.ListableURI, err error) {
 			if err == nil && u != nil {
 				path := u.Path()
@@ -170,10 +170,10 @@ func buildMonitorPage(state *AppState) fyne.CanvasObject {
 
 // buildResultsPage lists duplicate groups with sorting and details
 func buildResultsPage(state *AppState) fyne.CanvasObject {
-	sortSelect := widget.NewSelect([]string{"默认", "按文件数降序", "按大小降序", "按相似度降序"}, nil)
-	sortSelect.Selected = "默认"
+	sortSelect := widget.NewSelect([]string{t(state, "sort_default"), t(state, "sort_files_desc"), t(state, "sort_size_desc"), t(state, "sort_similarity_desc")}, nil)
+	sortSelect.Selected = t(state, "sort_default")
 
-	groupTitle := widget.NewLabel("选择一个重复组以查看详情")
+	groupTitle := widget.NewLabel(t(state, "msg_select_group_for_details"))
 	var thumbImg *canvas.Image
 	filesList := widget.NewList(
 		func() int { return 0 },
@@ -202,9 +202,9 @@ func buildResultsPage(state *AppState) fyne.CanvasObject {
 	refreshLists := func() {
 		state.mu.Lock()
 		switch sortSelect.Selected {
-		case "按文件数降序":
+		case t(state, "sort_files_desc"):
 			sort.Slice(state.Results, func(i, j int) bool { return len(state.Results[i].Files) > len(state.Results[j].Files) })
-		case "按大小降序":
+		case t(state, "sort_size_desc"):
 			size := func(g core.DuplicateGroup) int64 {
 				var s int64
 				for _, f := range g.Files {
@@ -213,7 +213,7 @@ func buildResultsPage(state *AppState) fyne.CanvasObject {
 				return s
 			}
 			sort.Slice(state.Results, func(i, j int) bool { return size(state.Results[i]) > size(state.Results[j]) })
-		case "按相似度降序":
+		case t(state, "sort_similarity_desc"):
 			sort.Slice(state.Results, func(i, j int) bool {
 				si := core.EstimateGroupSimilarity(state.Results[i].Files)
 				sj := core.EstimateGroupSimilarity(state.Results[j].Files)
@@ -258,7 +258,7 @@ func buildResultsPage(state *AppState) fyne.CanvasObject {
 					state.mu.Unlock()
 					img = timg
 				} else {
-					thumbError.SetText("缩略图生成失败")
+					thumbError.SetText(t(state, "msg_thumbnail_generation_failed"))
 				}
 			}
 			if img != nil {
@@ -277,7 +277,7 @@ func buildResultsPage(state *AppState) fyne.CanvasObject {
 				thumbGrid.Add(canvas.NewImageFromImage(ti))
 				continue
 			}
-			thumbGrid.Add(widget.NewLabel("生成中…"))
+			thumbGrid.Add(widget.NewLabel(t(state, "msg_generating")))
 			go func(path string) {
 				sem <- struct{}{}
 				defer func() { <-sem }()

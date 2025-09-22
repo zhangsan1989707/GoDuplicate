@@ -29,8 +29,6 @@ if exist "%VCVARSALL_PATH%" (
         echo 请运行hastegui.exe启动GUI版本。
     ) else (
         echo 构建失败，请检查错误信息。
-        echo 您也可以尝试使用nogl标签进行软件渲染模式构建：
-        echo go build -tags nogl -o hastegui.exe ./cmd/hastegui
     )
 ) else (
     echo 未找到vcvarsall.bat文件，请确认VS Build Tools安装路径。

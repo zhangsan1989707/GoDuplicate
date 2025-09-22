@@ -37,16 +37,16 @@ func buildExecutePage(state *AppState) fyne.CanvasObject {
 		logList.Refresh()
 	}
 
-	dryRun := widget.NewCheck("Dry-Run", func(bool) {})
+	dryRun := widget.NewCheck(t(state, "check_dry_run"), func(bool) {})
 	dryRun.SetChecked(true)
 
 	policySelect := widget.NewSelect([]string{"skip", "overwrite", "rename"}, nil)
 	policySelect.Selected = "rename"
 
-	previewBtn := widget.NewButton("刷新预览", func() { refreshPlan() })
-	executeBtn := widget.NewButton("执行并保存日志", func() {
+	previewBtn := widget.NewButton(t(state, "btn_refresh_preview"), func() { refreshPlan() })
+	executeBtn := widget.NewButton(t(state, "btn_execute_save_log"), func() {
 		if len(st.plan) == 0 {
-			st.logs = append(st.logs, "无可执行项")
+			st.logs = append(st.logs, t(state, "msg_no_executable_items"))
 			logList.Refresh()
 			return
 		}
@@ -62,9 +62,9 @@ func buildExecutePage(state *AppState) fyne.CanvasObject {
 		logList.Refresh()
 	})
 
-	undoBtn := widget.NewButton("撤销上次", func() {
+	undoBtn := widget.NewButton(t(state, "btn_undo_last"), func() {
 		if st.lastResult == nil {
-			st.logs = append(st.logs, "无可撤销记录")
+			st.logs = append(st.logs, t(state, "msg_no_undo_record"))
 			logList.Refresh()
 			return
 		}
@@ -78,12 +78,12 @@ func buildExecutePage(state *AppState) fyne.CanvasObject {
 		logList.Refresh()
 	})
 
-	openLogsBtn := widget.NewButton("打开日志目录", func() {
+	openLogsBtn := widget.NewButton(t(state, "btn_open_log_dir"), func() {
 		dir := os.TempDir()
 		st.logs = append(st.logs, fmt.Sprintf("日志目录: %s", dir))
 		logList.Refresh()
 	})
 
-	controls := container.NewHBox(dryRun, widget.NewLabel("冲突策略:"), policySelect, previewBtn, executeBtn, undoBtn, openLogsBtn)
+	controls := container.NewHBox(dryRun, widget.NewLabel(t(state, "label_conflict_policy")+":"), policySelect, previewBtn, executeBtn, undoBtn, openLogsBtn)
 	return container.NewBorder(controls, nil, nil, nil, logList)
 }

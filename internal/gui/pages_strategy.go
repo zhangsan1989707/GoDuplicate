@@ -17,23 +17,23 @@ type strategyUI struct {
 
 func buildStrategyPage(state *AppState, onPlan func([]core.PlanItem)) fyne.CanvasObject {
 	ui := &strategyUI{policy: core.Policy{
-		Name:        "安全删除",
-		Description: "每组保留一个，删除其他（预览模式）",
+		Name:        t(state, "strategy_safe_delete"),
+		Description: t(state, "strategy_safe_delete_desc"),
 		Rule:        core.PolicyRule{KeepNewest: true},
 		Action:      core.Action{Type: core.ActionDelete, DryRun: true},
 	}}
 
-	templateSelect := widget.NewSelect([]string{"安全删除", "移动到目录", "重命名加后缀"}, func(v string) {
+	templateSelect := widget.NewSelect([]string{t(state, "strategy_safe_delete"), t(state, "strategy_move_to_dir"), t(state, "strategy_rename_suffix")}, func(v string) {
 		switch v {
-		case "安全删除":
-			ui.policy = core.Policy{Name: v, Description: "每组保留一个，删除其他（预览）", Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionDelete, DryRun: true}}
-		case "移动到目录":
-			ui.policy = core.Policy{Name: v, Description: "将重复文件移动到指定目录（预览）", Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionMove, DestinationDir: "D:/DuplicateArchive", DryRun: true}}
-		case "重命名加后缀":
-			ui.policy = core.Policy{Name: v, Description: "为重复文件添加 .dup 后缀（预览）", Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionRename, RenameSuffix: ".dup", DryRun: true}}
+		case t(state, "strategy_safe_delete"):
+			ui.policy = core.Policy{Name: v, Description: t(state, "strategy_safe_delete_desc_short"), Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionDelete, DryRun: true}}
+		case t(state, "strategy_move_to_dir"):
+			ui.policy = core.Policy{Name: v, Description: t(state, "strategy_move_to_dir_desc"), Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionMove, DestinationDir: "D:/DuplicateArchive", DryRun: true}}
+		case t(state, "strategy_rename_suffix"):
+			ui.policy = core.Policy{Name: v, Description: t(state, "strategy_rename_suffix_desc"), Rule: core.PolicyRule{KeepNewest: true}, Action: core.Action{Type: core.ActionRename, RenameSuffix: ".dup", DryRun: true}}
 		}
 	})
-	templateSelect.Selected = "安全删除"
+	templateSelect.Selected = t(state, "strategy_safe_delete")
 
 	list := widget.NewList(
 		func() int { return len(ui.plan) },
@@ -47,7 +47,7 @@ func buildStrategyPage(state *AppState, onPlan func([]core.PlanItem)) fyne.Canva
 		},
 	)
 
-	genBtn := widget.NewButton("生成预览计划", func() {
+	genBtn := widget.NewButton(t(state, "btn_generate_preview_plan"), func() {
 		state.mu.RLock()
 		groups := state.Results
 		state.mu.RUnlock()
@@ -56,15 +56,15 @@ func buildStrategyPage(state *AppState, onPlan func([]core.PlanItem)) fyne.Canva
 		// write to shared state
 		state.mu.Lock()
 		state.Plan = ui.plan
-		state.Logs = append(state.Logs, fmt.Sprintf("生成计划: %d 项", len(ui.plan)))
+		state.Logs = append(state.Logs, fmt.Sprintf(t(state, "msg_plan_generated"), len(ui.plan)))
 		state.mu.Unlock()
 		list.Refresh()
 	})
 
 	presetName := widget.NewEntry()
-	presetName.SetPlaceHolder("策略预设名称")
-	saveBtn := widget.NewButton("保存策略预设", func() { _, _ = core.SavePolicyPreset(core.PolicyPreset{Name: presetName.Text, Policy: ui.policy}) })
-	loadBtn := widget.NewButton("加载策略预设", func() {
+	presetName.SetPlaceHolder(t(state, "placeholder_policy_preset_name"))
+	saveBtn := widget.NewButton(t(state, "btn_save_policy_preset"), func() { _, _ = core.SavePolicyPreset(core.PolicyPreset{Name: presetName.Text, Policy: ui.policy}) })
+	loadBtn := widget.NewButton(t(state, "btn_load_policy_preset"), func() {
 		p, err := core.LoadPolicyPreset(presetName.Text)
 		if err == nil {
 			ui.policy = p.Policy
@@ -72,8 +72,8 @@ func buildStrategyPage(state *AppState, onPlan func([]core.PlanItem)) fyne.Canva
 	})
 
 	header := container.NewVBox(
-		container.NewHBox(widget.NewLabel("策略模板:"), templateSelect, genBtn),
-		container.NewHBox(widget.NewLabel("策略预设:"), presetName, saveBtn, loadBtn),
+		container.NewHBox(widget.NewLabel(t(state, "label_strategy_template")+"："), templateSelect, genBtn),
+		container.NewHBox(widget.NewLabel(t(state, "label_policy_preset")+"："), presetName, saveBtn, loadBtn),
 	)
 	return container.NewBorder(header, nil, nil, nil, list)
 }

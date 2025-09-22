@@ -60,18 +60,6 @@ jobs:
           }
         shell: pwsh
 
-      # 构建nogl标签的GUI版本（尝试软件渲染模式）
-      - name: 构建nogl标签的GUI版本
-        run: |
-          $env:CGO_ENABLED = "1"
-          go build -tags nogl -o hastegui_nogl.exe ./cmd/hastegui
-          if (Test-Path .\hastegui_nogl.exe) { 
-            Write-Host "nogl标签GUI版本构建成功！" 
-          } else {
-            Write-Host "警告：nogl标签GUI版本构建失败"
-          }
-        shell: pwsh
-
       - name: 列出构建产物
         run: Get-ChildItem -Path . -Filter *.exe | Format-Table -Property Name, LastWriteTime, Length
         shell: pwsh
