@@ -71,7 +71,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 	cLabel := widget.NewLabel(fmt.Sprintf(t(state, "label_concurrency"), int(concurrency.Value)))
 	concurrency.OnChanged = func(v float64) {
 		iv := int(v)
-		cLabel.SetText(fmt.Sprintf("并发度: %d", iv))
+		cLabel.SetText(fmt.Sprintf(t(state, "label_concurrency"), iv))
 		state.mu.Lock()
 		state.Concurrency = iv
 		state.mu.Unlock()
@@ -86,7 +86,7 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 		state.mu.Lock()
 		state.SimilarityThreshold = v
 		state.mu.Unlock()
-		simLabel.SetText(fmt.Sprintf("相似度阈值: %.2f", v))
+		simLabel.SetText(fmt.Sprintf(t(state, "label_similarity"), v))
 	}
 	simSlider.SetValue(state.SimilarityThreshold)
 
@@ -112,14 +112,14 @@ func buildConfigPage(state *AppState, onStart func(cfg core.ScanConfig)) fyne.Ca
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "扫描路径(;)分隔", Widget: includeEntry},
-			{Text: "排除模式(;)分隔", Widget: excludeEntry},
-			{Text: "模式", Widget: modeSelect},
-			{Text: "哈希算法", Widget: hashSelect},
-			{Text: "最小大小", Widget: minEntry},
-			{Text: "最大大小", Widget: maxEntry},
-			{Text: "并发度", Widget: container.NewHBox(concurrency, cLabel)},
-			{Text: "相似度", Widget: container.NewHBox(simSlider, simLabel)},
+			{Text: t(state, "form_include_paths"), Widget: includeEntry},
+			{Text: t(state, "form_exclude_patterns"), Widget: excludeEntry},
+			{Text: t(state, "form_mode"), Widget: modeSelect},
+			{Text: t(state, "form_hash_algorithm"), Widget: hashSelect},
+			{Text: t(state, "form_min_size"), Widget: minEntry},
+			{Text: t(state, "form_max_size"), Widget: maxEntry},
+			{Text: t(state, "form_concurrency"), Widget: container.NewHBox(concurrency, cLabel)},
+			{Text: t(state, "form_similarity"), Widget: container.NewHBox(simSlider, simLabel)},
 		},
 		OnSubmit: func() { onStart(state.ToScanConfig()) },
 	}
