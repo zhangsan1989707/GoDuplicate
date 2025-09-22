@@ -16,8 +16,8 @@
 
 工作流会在以下情况下自动触发：
 
-1. 代码推送到`main`分支时
-2. 有PR（Pull Request）提交到`main`分支时
+1. 代码推送到`master`分支时
+2. 有PR（Pull Request）提交到`master`分支时
 3. 手动通过GitHub界面触发（`workflow_dispatch`）
 
 ## CI流水线详细步骤
