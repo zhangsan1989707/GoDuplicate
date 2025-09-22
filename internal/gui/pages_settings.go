@@ -15,9 +15,9 @@ func buildSettingsPage(state *AppState) fyne.CanvasObject {
 		state.Theme = v
 		state.mu.Unlock()
 		if v == "dark" {
-			fyne.CurrentApp().Settings().SetTheme(themePkgDark())
+			fyne.CurrentApp().Settings().SetTheme(newChineseTheme(themePkgDark()))
 		} else {
-			fyne.CurrentApp().Settings().SetTheme(themePkgLight())
+			fyne.CurrentApp().Settings().SetTheme(newChineseTheme(themePkgLight()))
 		}
 	})
 	theme.Selected = state.Theme
@@ -36,21 +36,21 @@ func buildSettingsPage(state *AppState) fyne.CanvasObject {
 	})
 	lang.Selected = state.Language
 	ffmpegEntry := widget.NewEntry()
-	ffmpegEntry.SetPlaceHolder("可选：手动指定 ffmpeg 可执行路径")
+	ffmpegEntry.SetPlaceHolder(t(state, "placeholder_ffmpeg_path"))
 	state.mu.RLock()
 	ffmpegEntry.SetText(state.FfmpegPath)
 	state.mu.RUnlock()
 	ffmpegEntry.OnChanged = func(v string) { state.mu.Lock(); state.FfmpegPath = v; state.mu.Unlock() }
 
 	presetName := widget.NewEntry()
-	presetName.SetPlaceHolder("预设名称")
-	savePresetBtn := widget.NewButton("保存扫描预设", func() {
+	presetName.SetPlaceHolder(t(state, "placeholder_preset_name"))
+	savePresetBtn := widget.NewButton(t(state, "btn_save_preset"), func() {
 		state.mu.RLock()
 		cfg := state.ToScanConfig()
 		state.mu.RUnlock()
 		_, _ = core.SaveScanPreset(core.ScanPreset{Name: presetName.Text, Config: cfg})
 	})
-	loadPresetBtn := widget.NewButton("加载扫描预设", func() {
+	loadPresetBtn := widget.NewButton(t(state, "btn_load_preset"), func() {
 		p, err := core.LoadScanPreset(presetName.Text)
 		if err == nil {
 			state.mu.Lock()
@@ -67,29 +67,29 @@ func buildSettingsPage(state *AppState) fyne.CanvasObject {
 	})
 
 	presetList := widget.NewSelect([]string{}, func(v string) { presetName.SetText(v) })
-	refreshListBtn := widget.NewButton("刷新预设列表", func() {
+	refreshListBtn := widget.NewButton(t(state, "btn_refresh_presets"), func() {
 		if names, err := core.ListScanPresets(); err == nil {
 			presetList.Options = names
 			presetList.Refresh()
 		}
 	})
-	deletePresetBtn := widget.NewButton("删除选中预设", func() { _ = core.DeleteScanPreset(presetList.Selected) })
+	deletePresetBtn := widget.NewButton(t(state, "btn_delete_preset"), func() { _ = core.DeleteScanPreset(presetList.Selected) })
 
 	return container.NewVBox(
 		widget.NewForm(
-			widget.NewFormItem("主题", theme),
-			widget.NewFormItem("语言", lang),
-			widget.NewFormItem("ffmpeg 路径", ffmpegEntry),
+			widget.NewFormItem(t(state, "label_theme"), theme),
+			widget.NewFormItem(t(state, "label_language"), lang),
+			widget.NewFormItem(t(state, "label_ffmpeg_path"), ffmpegEntry),
 		),
 		widget.NewForm(
-			widget.NewFormItem("预设名称", presetName),
-			widget.NewFormItem("保存", savePresetBtn),
-			widget.NewFormItem("加载", loadPresetBtn),
+			widget.NewFormItem(t(state, "label_preset_name"), presetName),
+			widget.NewFormItem(t(state, "label_save"), savePresetBtn),
+			widget.NewFormItem(t(state, "label_load"), loadPresetBtn),
 		),
 		widget.NewForm(
-			widget.NewFormItem("预设列表", presetList),
-			widget.NewFormItem("刷新", refreshListBtn),
-			widget.NewFormItem("删除", deletePresetBtn),
+			widget.NewFormItem(t(state, "label_preset_list"), presetList),
+			widget.NewFormItem(t(state, "label_refresh"), refreshListBtn),
+			widget.NewFormItem(t(state, "label_delete"), deletePresetBtn),
 		),
 	)
 }

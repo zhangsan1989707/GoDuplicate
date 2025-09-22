@@ -58,7 +58,7 @@ jobs:
       - name: 构建GUI版本
         run: |
           $env:CGO_ENABLED = "1"
-          go build -o hastegui.exe ./cmd/hastegui
+          go build -ldflags="-H windowsgui" -o hastegui.exe ./cmd/hastegui
           if (Test-Path .\hastegui.exe) { 
             Write-Host "GUI版本构建成功！" 
           } else {
