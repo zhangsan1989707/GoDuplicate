@@ -4,9 +4,9 @@ name: Build Windows Executables
 
 on:
   push:
-    branches: [ master ]
+    branches: [ '*' ]
   pull_request:
-    branches: [ master ]
+    branches: [ '*' ]
   workflow_dispatch:  # 允许手动触发
 
 jobs:
