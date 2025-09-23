@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"io/ioutil"
 	"os"
 	"image/color"
 
@@ -17,9 +18,33 @@ type customTheme struct {
 	baseTheme fyne.Theme
 }
 
-// 重写字体方法，确保使用支持中文的字体
+// 重写字体方法，使用项目中的中文字体
 func (c customTheme) Font(s fyne.TextStyle) fyne.Resource {
-	// 在Windows系统上，返回nil可以让Fyne自动在系统中查找支持中文的字体
+	// 尝试从项目目录加载中文字体（优先使用黑体）
+	fontPath := "font/simhei.ttf"
+	
+	// 检查字体文件是否存在
+	if _, err := os.Stat(fontPath); err == nil {
+		// 加载字体文件
+		fontData, err := ioutil.ReadFile(fontPath)
+		if err == nil {
+			// 创建字体资源
+			fontRes := fyne.NewStaticResource("simhei.ttf", fontData)
+			return fontRes
+		}
+	}
+	
+	// 如果黑体加载失败，尝试加载宋体
+	fontPath = "font/simsunb.ttf"
+	if _, err := os.Stat(fontPath); err == nil {
+		fontData, err := ioutil.ReadFile(fontPath)
+		if err == nil {
+			fontRes := fyne.NewStaticResource("simsunb.ttf", fontData)
+			return fontRes
+		}
+	}
+	
+	// 如果加载失败，返回nil让系统自动查找
 	return nil
 }
 
@@ -41,9 +66,16 @@ func newChineseTheme(base fyne.Theme) fyne.Theme {
 	return customTheme{baseTheme: base}
 }
 
-// 确保所有文本元素都使用系统默认字体（支持中文）
+// 确保所有文本元素都使用支持中文的字体
 func ensureChineseFontSupport() {
-	// 确保应用程序使用系统字体
+	// 提前检查字体文件是否存在，确保在UI渲染前可用
+	fontPaths := []string{"font/simhei.ttf", "font/simsunb.ttf"}
+	for _, path := range fontPaths {
+		if _, err := os.Stat(path); err != nil {
+			// 如果字体文件不存在，可以考虑使用备用方案或记录日志
+			// 在实际应用中，可以添加日志记录或其他处理逻辑
+		}
+	}
 }
 
 // 确保中文显示正常

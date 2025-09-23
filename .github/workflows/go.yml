@@ -60,7 +60,16 @@ jobs:
           $env:CGO_ENABLED = "1"
           go build -ldflags="-H windowsgui" -o hastegui.exe ./cmd/hastegui
           if (Test-Path .\hastegui.exe) { 
-            Write-Host "GUI版本构建成功！" 
+            Write-Host "GUI版本构建成功！"
+            # 准备分发目录并处理字体文件
+            New-Item -ItemType Directory -Force -Path dist
+            Copy-Item hastegui.exe dist/
+            if (Test-Path -Path ".\font" -PathType Container) {
+              Copy-Item -Path ".\font" -Destination "dist\font" -Recurse
+              Write-Host "字体文件已复制到分发目录"
+            } else {
+              Write-Host "警告：未找到字体目录"
+            }
           } else {
             Write-Host "警告：GUI版本构建失败，这是预期的，因为CGO依赖问题"
           }
@@ -76,6 +85,7 @@ jobs:
           name: goduplicate-windows-binaries
           path: |
             *.exe
+            dist/
           retention-days: 7
 
   # 可选：测试CLI功能
