@@ -33,6 +33,8 @@ func buildSettingsPage(state *AppState) fyne.CanvasObject {
 				ws[0].SetTitle("HasteGUI Duplicate Manager")
 			}
 		}
+		// 触发语言变更回调，刷新所有界面元素
+		state.TriggerLanguageChangedCallbacks()
 	})
 	lang.Selected = state.Language
 	ffmpegEntry := widget.NewEntry()

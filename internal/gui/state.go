@@ -7,6 +7,9 @@ import (
 	"goduplicate/internal/core"
 )
 
+// LanguageChangedCallback 语言变更回调函数类型
+type LanguageChangedCallback func()
+
 // AppState holds shared state between GUI tabs.
 type AppState struct {
 	mu sync.RWMutex
@@ -41,6 +44,9 @@ type AppState struct {
 
 	// Caches
 	ThumbCache map[string]image.Image
+
+	// Callbacks
+	LanguageChangedCallbacks []LanguageChangedCallback
 }
 
 func NewAppState() *AppState {
@@ -50,7 +56,7 @@ func NewAppState() *AppState {
 		HashAlgorithm:       "sha1",
 		SimilarityThreshold: 0.85,
 		Theme:               "light",
-		Language:            "en-US",
+		Language:            "zh-CN", // 默认设置为中文
 		ThumbCache:          make(map[string]image.Image),
 	}
 }
@@ -85,6 +91,25 @@ func splitSemicolon(v string) []string {
 		}
 	}
 	return out
+}
+
+// RegisterLanguageChangedCallback 注册语言变更回调函数
+func (s *AppState) RegisterLanguageChangedCallback(callback LanguageChangedCallback) {
+	s.mu.Lock()
+	s.LanguageChangedCallbacks = append(s.LanguageChangedCallbacks, callback)
+	s.mu.Unlock()
+}
+
+// TriggerLanguageChangedCallbacks 触发所有语言变更回调函数
+func (s *AppState) TriggerLanguageChangedCallbacks() {
+	s.mu.RLock()
+	callbacks := make([]LanguageChangedCallback, len(s.LanguageChangedCallbacks))
+	copy(callbacks, s.LanguageChangedCallbacks)
+	s.mu.RUnlock()
+	
+	for _, callback := range callbacks {
+		callback()
+	}
 }
 
 func trimSpaces(s string) string {

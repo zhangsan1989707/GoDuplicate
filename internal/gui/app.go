@@ -167,6 +167,31 @@ func Run() {
 		container.NewTabItem(t(state, "tab_settings"), buildSettingsPage(state)),
 	)
 
+	// 添加语言变更回调函数，在语言切换时刷新所有界面元素
+	refreshTabs := func() {
+		newTabs := container.NewAppTabs(
+			container.NewTabItem(t(state, "tab_config"), buildConfigPage(state, startScan)),
+			container.NewTabItem(t(state, "tab_monitor"), buildMonitorPage(state)),
+			container.NewTabItem(t(state, "tab_results"), buildResultsPage(state)),
+			container.NewTabItem(t(state, "tab_strategy"), buildStrategyPage(state, func(plan []core.PlanItem) {})),
+			container.NewTabItem(t(state, "tab_execute"), buildExecutePage(state)),
+			container.NewTabItem(t(state, "tab_settings"), buildSettingsPage(state)),
+		)
+		// 保持当前选中的标签页
+		currentIndex := tabs.SelectedIndex()
+		w.SetContent(newTabs)
+		if currentIndex >= 0 && currentIndex < len(newTabs.Items) {
+			newTabs.SelectIndex(currentIndex)
+		}
+		tabs = newTabs
+	}
+	
+	// 注册语言变更回调函数
+	state.RegisterLanguageChangedCallback(func() {
+		refreshTabs()
+		applyTheme()
+	})
+	
 	w.SetContent(tabs)
 	w.Resize(fyne.NewSize(1024, 700))
 	w.ShowAndRun()

@@ -84,7 +84,7 @@ jobs:
         with:
           name: goduplicate-windows-binaries
           path: |
-            *.exe
+            hastecli.exe
             dist/
           retention-days: 7
 
